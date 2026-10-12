@@ -3,5 +3,5 @@ CREATE TABLE tracked_repositories (
     owner TEXT NOT NULL,                                             -- reference to the user's github acc
     name TEXT NOT NULL,                                              -- name of repostiory
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, 
-    CONSTRAINT unique_repo UNIQUE (owner, name)                      -- avoids duplicate repo registration
+    CONSTRAINT unique_repository UNIQUE (owner, name)                -- avoids duplicate repo registration
 )
