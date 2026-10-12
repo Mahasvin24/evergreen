@@ -1,7 +1,7 @@
 services:
   # PostgreSQL database
   postgres:
-    image: postgres
+    image: postgres:17
     environment:
       POSTGRES_DB: everygreen
       POSTGRES_USER: mahasvin
