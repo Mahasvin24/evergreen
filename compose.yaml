@@ -3,7 +3,7 @@ services:
   postgres:
     image: postgres:17
     environment:
-      POSTGRES_DB: everygreen
+      POSTGRES_DB: evergreen
       POSTGRES_USER: mahasvin
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     ports:
