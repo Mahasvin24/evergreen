@@ -22,8 +22,6 @@ public class TrackedRepositoriesController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "URL is required");
         }
 
-        
-
         // success
         return Map.of("url", url);
     }   
