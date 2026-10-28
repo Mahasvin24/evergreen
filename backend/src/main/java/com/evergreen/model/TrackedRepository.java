@@ -1,5 +1,8 @@
 package com.evergreen.model;
 
+import java.util.UUID;
+import java.time.Instant;
+
 import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -11,9 +14,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-
-import java.util.UUID;
-import java.time.Instant;
 
 // CREATE TABLE tracked_repositories (
 //     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),                   -- random id

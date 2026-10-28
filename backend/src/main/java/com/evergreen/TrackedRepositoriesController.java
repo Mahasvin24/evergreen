@@ -1,19 +1,22 @@
 package com.evergreen;
 
 import java.util.Map;
+import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.evergreen.service.TrackedRepositoryService;
+import com.evergreen.model.TrackedRepository;
 
 @RestController 
 public class TrackedRepositoriesController {
-    // servuce
-    public final TrackedRepositoryService service;
+    // service
+    private final TrackedRepositoryService service;
 
     // data models
     public record TrackRepositoryRequest(String url, String owner, String name) {}
@@ -41,4 +44,9 @@ public class TrackedRepositoriesController {
         // success
         return Map.of("url", url);
     } 
+
+    @GetMapping("/repositories")
+    public List<TrackedRepository> getAllTrackedRepositories() {
+        return service.getAllTrackedRepositories();
+    }
 }
