@@ -17,6 +17,7 @@ import jakarta.persistence.UniqueConstraint;
 
 // CREATE TABLE tracked_repositories (
 //     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),                   -- random id
+//     url TEXT NOT NULL,
 //     owner TEXT NOT NULL,                                             -- GitHub user or organization that owns the repository
 //     name TEXT NOT NULL,                                              -- name of repository
 //     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -35,6 +36,9 @@ public class TrackedRepository {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
+    @Column(name = "url", updatable = false, nullable = false)
+    private String url;
+
     @Column(name = "owner", updatable = false, nullable = false)
     private String owner;
 
@@ -47,7 +51,8 @@ public class TrackedRepository {
 
     /* Constructor */
     protected TrackedRepository() {}
-    public TrackedRepository(String owner, String name) {
+    public TrackedRepository(String url, String owner, String name) {
+        this.url = url;
         this.owner = owner;
         this.name = name;
     }
@@ -55,6 +60,10 @@ public class TrackedRepository {
     /* Functions */
     public UUID getId() {
         return this.id;
+    }
+
+    public String getUrl() {
+        return this.url;
     }
 
     public String getOwner() {

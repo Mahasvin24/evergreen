@@ -28,6 +28,7 @@ public class TrackedRepositoriesController {
 
     @PostMapping("/repositories")
     public Map<String, String> trackRepository(@RequestBody TrackRepositoryRequest request) {
+        // read fields
         String url = request.url();
         String owner = request.owner();
         String name = request.name();
@@ -38,11 +39,13 @@ public class TrackedRepositoriesController {
             owner == null || owner.isBlank() ||
             name == null || name.isBlank()
         ) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "URL, owner, and name are required fields.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing one or more of the following fields: url, owner, name.");
         }
+        
+        service.addTrackedRepository(url, owner, name);
 
         // success
-        return Map.of("url", url);
+        return Map.of("success", "true");
     } 
 
     @GetMapping("/repositories")
