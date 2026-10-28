@@ -8,21 +8,37 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.evergreen.service.TrackedRepositoryService;
+
 @RestController 
 public class TrackedRepositoriesController {
+    // servuce
+    public final TrackedRepositoryService service;
 
-    public record TrackRepositoryRequest(String url) {}
+    // data models
+    public record TrackRepositoryRequest(String url, String owner, String name) {}
+
+    // constructor
+    public TrackedRepositoriesController(TrackedRepositoryService service) {
+        this.service = service;
+    }
 
     @PostMapping("/repositories")
     public Map<String, String> trackRepository(@RequestBody TrackRepositoryRequest request) {
         String url = request.url();
+        String owner = request.owner();
+        String name = request.name();
 
-        // invalid URL
-        if (url == null || url.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "URL is required");
+        // Validate input
+        if (
+            url == null || url.isBlank() ||
+            owner == null || owner.isBlank() ||
+            name == null || name.isBlank()
+        ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "URL, owner, and name are required fields.");
         }
 
         // success
         return Map.of("url", url);
-    }   
+    } 
 }
