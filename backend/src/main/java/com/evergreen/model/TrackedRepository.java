@@ -52,7 +52,11 @@ public class TrackedRepository {
         this.name = name;
     }
 
-    /* Getters and Setters */
+    /* Functions */
+    public UUID getId() {
+        return this.id;
+    }
+
     public String getOwner() {
         return this.owner;
     }
