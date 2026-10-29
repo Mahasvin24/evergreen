@@ -28,8 +28,7 @@ public class TrackedRepositoryService {
         return repository.findById(id);
     }
 
-    public void addTrackedRepository(String owner, String name) {
-        TrackedRepository obj = new TrackedRepository(owner, name);
-        repository.save(obj);
+    public TrackedRepository addTrackedRepository(String owner, String name) {
+        return repository.save(new TrackedRepository(owner, name));
     }
 }

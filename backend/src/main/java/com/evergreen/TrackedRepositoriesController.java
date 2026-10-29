@@ -40,10 +40,12 @@ public class TrackedRepositoriesController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Missing one or more of the following fields: owner, name.");
         }
         
-        service.addTrackedRepository(owner, name);
+        TrackedRepository res = service.addTrackedRepository(owner, name);
 
         // success
-        return Map.of("success", "true");
+        return Map.of(
+            "id", res.getId().toString()
+        );
     } 
 
     @GetMapping("/repositories")
