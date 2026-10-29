@@ -36,9 +36,6 @@ public class TrackedRepository {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "url", updatable = false, nullable = false)
-    private String url;
-
     @Column(name = "owner", updatable = false, nullable = false)
     private String owner;
 
@@ -51,8 +48,7 @@ public class TrackedRepository {
 
     /* Constructor */
     protected TrackedRepository() {}
-    public TrackedRepository(String url, String owner, String name) {
-        this.url = url;
+    public TrackedRepository(String owner, String name) {
         this.owner = owner;
         this.name = name;
     }
@@ -61,20 +57,21 @@ public class TrackedRepository {
     public UUID getId() {
         return this.id;
     }
-
-    public String getUrl() {
-        return this.url;
-    }
-
     public String getOwner() {
         return this.owner;
     }
-
     public String getName() {
         return this.name;
     }
-
     public Instant getCreatedAt() {
         return this.createdAt;
+    }
+
+    /* Helpers */
+    public String getGitHubURL() {
+        return "https://github.com/%s/%s".formatted(this.owner, this.name);
+    }
+    public String getGitHubCloneURL() {
+        return "https://github.com/%s/%s.git".formatted(this.owner, this.name);
     }
 }
