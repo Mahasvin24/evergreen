@@ -1,0 +1,9 @@
+[project]
+name = "evergreen-agent"
+version = "0.1.0"
+description = "Evergreen's sandbox execution and agent workflows"
+requires-python = ">=3.12"
+dependencies = [
+    "langgraph",
+    "httpx",
+]
