@@ -17,7 +17,7 @@ def create_sandbox(repo_name, clone_url):
     sandbox_name = f"sandbox-{sandbox_id.hex}"
     repo_path = f"/home/agent/workspace/{repo_name}"
 
-    # Configure credentials before the sandbox's agent environment is created.
+    # set credentials
     subprocess.run(
         split(f"sbx secret set openai --sandbox {sandbox_name}"),
         input=openai_api_key + "\n",
@@ -25,15 +25,11 @@ def create_sandbox(repo_name, clone_url):
         check=True
     )
 
-    print("DEBUG: OpenAI API key set", flush=True)
-
     # create sandbox
     subprocess.run(
         split(f"sbx create --name {sandbox_name} opencode"),
         check=True
     )
-
-    print(f"DEBUG: sandbox created: {sandbox_name}", flush=True)
 
     # clone repo
     subprocess.run(
@@ -56,12 +52,6 @@ def create_sandbox(repo_name, clone_url):
         check=True,
     )
 
-    subprocess.run(
-        split(f"sbx exec {sandbox_name} test -s") + [f"{repo_path}/hello.md"],
-        check=True,
-    )
-
-    print("DEBUG: routine complete; hello.md verified", flush=True)
     return sandbox_name, repo_path
 
 if __name__ == "__main__":
