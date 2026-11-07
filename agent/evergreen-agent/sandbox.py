@@ -1,9 +1,11 @@
 # sandbox.py
 import os
+import json
 import subprocess
 from enum import StrEnum, auto
 from uuid import uuid4
 from pathlib import Path
+from tempfile import NamedTemporaryFile
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parents[2] / ".env")
@@ -14,9 +16,10 @@ class Sandbox:
         BUILDING = auto()
         CREATED = auto()
         FAILED = auto()
+        COMPLETED = auto()
 
+    # constructor
     def __init__(self, db_uuid: uuid4, owner: str, repo_name: str, clone_url: str):
-        """ Constructor """
         # param attrs
         self.uuid = db_uuid
         self.owner = owner
@@ -40,52 +43,73 @@ class Sandbox:
                 Error: {e}
             """)
 
-    # helper
-    def _split(self, cmd: str) -> list[str]:
-        """ Splits a string into tokens for subprocess.run() """
-        return cmd.split(" ")
-
     def _create_sandbox(self):
         """" Creates sandbox unless it already exists """
-        openai_api_key = os.environ["OPENAI_API_KEY"]
-        repo_path = f"/home/agent/workspace/{repo_name}"
+        anthropic_api_key = os.environ["ANTHROPIC_API_KEY"]
+        repo_path = f"/home/agent/workspace/{self.repo_name}"
+        model = "anthropic/claude-haiku-5-5"
+        config = {"autoupdate": False, "model": model, "small_model": model}
+        if base_url := os.environ.get("ANTHROPIC_BASE_URL"):
+            config["providers"] = {
+                "anthropic": {"settings": {"baseURL": base_url}}
+            }
 
         # set credentials
         subprocess.run(
-            self._split(f"sbx secret set openai --sandbox {sandbox_name}"),
-            input=openai_api_key + "\n",
+            self._split(f"sbx secret set anthropic --sandbox {self.sandbox_name}"),
+            input=anthropic_api_key + "\n",
             text=True,
             check=True
         )
 
         # create sandbox
         subprocess.run(
-            self._split(f"sbx create --name {sandbox_name} opencode"),
+            self._split(f"sbx create --name {self.sandbox_name} opencode"),
             check=True
         )
 
         # clone repo
         subprocess.run(
-            self._split(f"sbx exec {sandbox_name} git clone") + [clone_url, repo_path],
+            self._split(f"sbx exec {self.sandbox_name} git clone") + [self.clone_url, repo_path],
             check=True
         )
 
         print("DEBUG: repo cloned", flush=True)
 
         # run opencode in sandbox
-        subprocess.run(
-            self._split("sbx exec -w") + [repo_path] + self._split(
-                '-e OPENCODE_CONFIG_CONTENT={"autoupdate":false} '
-                f"{sandbox_name} opencode run --standalone "
-                "--model openai/gpt-5.4-mini"
-            ) + [
+        command = ["sbx", "exec", "-w", repo_path,
+                   "-e", "OPENCODE_CONFIG_CONTENT=" + json.dumps(config)]
+        agent_command = [self.sandbox_name, "opencode", "run", "--standalone",
+                         "--model", model] + [
                 "Create hello.md containing a short introduction about you. "
                 "Use a file editing tool, then verify the file exists."
-            ],
-            check=True,
-        )
+            ]
+        if base_url:
+            # Docker's secret proxy only substitutes keys for official endpoints.
+            # Use a private, short-lived env file for a custom endpoint instead.
+            with NamedTemporaryFile(mode="w", prefix="evergreen-anthropic-") as credentials:
+                credentials.write(f"ANTHROPIC_API_KEY={anthropic_api_key}\n")
+                credentials.flush()
+                subprocess.run(command + ["--env-file", credentials.name] + agent_command, check=True)
+        else:
+            subprocess.run(command + agent_command, check=True)
 
         self.status = self.Status.CREATED
+
+
+    # helper
+    def _split(self, cmd: str) -> list[str]:
+        """ Splits a string into tokens for subprocess.run() """
+        return cmd.split(" ")
+    
+    def is_created(self):
+        """ Checks if the sandbox already exists """
+        output = subprocess.run(
+            self._split(f"sbx ls"),
+            check=True
+        )
+
+        return self.sandbox_name in output
 
     def __str__(self):
         return f"""
