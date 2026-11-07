@@ -87,7 +87,14 @@ class Sandbox:
 
         self.status = self.Status.CREATED
 
-    
+    def __str__(self):
+        return f"""
+        {self.sandbox_name}
+        Owner: {self.owner}
+        Repository name: {self.repo_name}
+        Clone URL: {self.clone_url}
+        Status: {self.status}
+        """
 
 
 if __name__ == "__main__":
